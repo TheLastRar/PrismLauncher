@@ -27,7 +27,22 @@ set(CMAKE_C_STANDARD_REQUIRED true)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 include(GenerateExportHeader)
-set(CMAKE_CXX_FLAGS "-Wall -pedantic -fstack-protector-strong --param=ssp-buffer-size=4 ${CMAKE_CXX_FLAGS}")
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "-W4 /permissive- /GS ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup ${CMAKE_EXE_LINKER_FLAGS}")
+
+    # See https://github.com/ccache/ccache/issues/1040
+    # Note, CMake 3.25 replaces this with CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+    # See https://cmake.org/cmake/help/v3.25/variable/CMAKE_MSVC_DEBUG_INFORMATION_FORMAT.html
+    foreach(config DEBUG RELWITHDEBINFO)
+        foreach(lang C CXX)
+            set(flags_var "CMAKE_${lang}_FLAGS_${config}")
+            string(REGEX REPLACE "/Z[Ii]" "/Z7" ${flags_var} "${${flags_var}}")
+        endforeach()
+    endforeach()
+else()
+    set(CMAKE_CXX_FLAGS "-Wall -pedantic -fstack-protector-strong --param=ssp-buffer-size=4 ${CMAKE_CXX_FLAGS}")
+endif()
 
 # Fix build with Qt 5.13
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DQT_NO_DEPRECATED_WARNINGS=Y")
