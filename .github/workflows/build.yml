@@ -120,6 +120,7 @@ jobs:
         if: runner.os == 'Windows' && matrix.msystem != ''
         uses: msys2/setup-msys2@v2
         with:
+          path-type: inherit
           msystem: ${{ matrix.msystem }}
           update: true
           install: >-
