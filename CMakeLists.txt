@@ -31,7 +31,7 @@ if(MSVC)
     # /GS Adds buffer security checks, default on but incuded anyway to mirror gcc's fstack-protector flag
     # /permissive- specify standards-conforming compiler behavior, also enabled by Qt6, default on with std:c++20
     # Use /W4 as /Wall includes unnesserey warnings such as added padding to structs
-    set(CMAKE_CXX_FLAGS "/GS /permissive- /W4 ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "/GS /permissive- /W4 /showIncludes ${CMAKE_CXX_FLAGS}")
 
     # LINK accepts /SUBSYSTEM whics sets if we are a WINDOWS (gui) or a CONSOLE programs
     # This implicitly selects an entrypoint specific to the subsystem selected
@@ -66,7 +66,7 @@ if(MSVC)
         set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release "")
     endif()
 else()
-    set(CMAKE_CXX_FLAGS "-Wall -pedantic -fstack-protector-strong --param=ssp-buffer-size=4 ${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "-Wall -pedantic -fstack-protector-strong --param=ssp-buffer-size=4 -H ${CMAKE_CXX_FLAGS}")
 
     # ATL's pack list needs more than the default 1 Mib stack on windows
     if(WIN32)
