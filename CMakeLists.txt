@@ -391,8 +391,15 @@ if(FORCE_BUNDLED_ZLIB)
     set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) # Suppress cmake warnings and allow INTERPROCEDURAL_OPTIMIZATION for zlib
     set(SKIP_INSTALL_ALL ON)
     add_subdirectory(libraries/zlib EXCLUDE_FROM_ALL)
-    
-    set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib" "${CMAKE_CURRENT_BINARY_DIR}/libraries/zlib" CACHE STRING "" FORCE)
+
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib/zconf.h.included")
+        # zlib's cmake script renames a file, dirtying the submodule, see https://github.com/madler/zlib/issues/162
+        message(STATUS "Undoing Rename")
+        message(STATUS "    ${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib/zconf.h")
+        file(RENAME "${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib/zconf.h.included" "${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib/zconf.h")
+    endif()
+
+    set(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/libraries/zlib" "${CMAKE_CURRENT_SOURCE_DIR}/libraries/zlib" CACHE STRING "" FORCE)
     set_target_properties(zlibstatic PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIR}")
     add_library(ZLIB::ZLIB ALIAS zlibstatic)
     set(ZLIB_LIBRARY ZLIB::ZLIB CACHE STRING "zlib library name")
